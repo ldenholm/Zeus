@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -21,7 +22,8 @@ namespace Zeus
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ZeusDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddAutoMapper();
+            services.AddDbContext<ZeusDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("PreProduction")));
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -31,7 +33,7 @@ namespace Zeus
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ZeusDbContext db)
         {
             if (env.IsDevelopment())
             {
@@ -47,6 +49,8 @@ namespace Zeus
             {
                 app.UseSpaStaticFiles();
             }
+
+            db.Database.EnsureCreated();
 
             app.UseRouting();
 
